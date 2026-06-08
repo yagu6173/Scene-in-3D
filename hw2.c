@@ -35,7 +35,7 @@ int th=0;         //  Azimuth of view angle
 int ph=0;         //  Elevation of view angle
 int step=0;       //  Step counter for first person movement
 int t = 0;        //  Step direction for first person movement
-int alpha=90;     //  First person view angle
+int alpha=0;     //  First person view angle
 int fov=55;      //  Field of view (for perspective)
 double asp=1;     //  Aspect ratio
 double dim=5.0;   //  Size of world
@@ -325,10 +325,10 @@ static void tree(double x, double y, double z, double s)
    glPopMatrix();
 }
 
-// // Draw a car
-// static void car(double x, double y, double z, double s)
-// {
-// }
+static void Canopy(double th,double ph)
+{
+   glVertex3d(Sin(th)*Cos(ph) , Sin(ph) , Cos(th)*Cos(ph));
+}
 
 /*
  *  Draw solid airplane
@@ -398,22 +398,22 @@ static void SolidPlane(double x,double y,double z,
    for (int th=0;th<=360;th+=30)
       glVertex3d(tail,wid*Cos(th),wid*Sin(th));
    glEnd();
-   // //  Canopy
-   // glPushMatrix();
-   // glTranslated(0.15,wid,0);
-   // glScaled(0.05,0.03,0.03);
-   // glColor3f(1,1,1);
-   // for (int ph=-30;ph<90;ph+=30)
-   // {
-   //    glBegin(GL_QUAD_STRIP);
-   //    for (int th=0;th<=360;th+=30)
-   //    {
-   //       Canopy(th,ph);
-   //       Canopy(th,ph+30);
-   //    }
-   //    glEnd();
-   // }
-   // glPopMatrix();
+   //  Canopy
+   glPushMatrix();
+   glTranslated(0.15,wid,0);
+   glScaled(0.05,0.03,0.03);
+   glColor3f(1,1,1);
+   for (int ph=-30;ph<90;ph+=30)
+   {
+      glBegin(GL_QUAD_STRIP);
+      for (int th=0;th<=360;th+=30)
+      {
+         Canopy(th,ph);
+         Canopy(th,ph+30);
+      }
+      glEnd();
+   }
+   glPopMatrix();
    //  Wings
    glColor3f(1,1,0);
    glBegin(GL_TRIANGLES);
@@ -466,20 +466,20 @@ void display()
    else if (mode==2)
    {
       if (step !=0 && t!=0){
-         double dx = t*Cos(alpha)*0.1;
-         double dy = t*Sin(alpha)*0.1;
+         double dx = t*Sin(alpha)*0.1;
+         double dy = t*Cos(alpha)*0.1;
          FV_Ex += dx;
          FV_Ey += dy;
          t = 0;
       }
-      gluLookAt(FV_Ex,FV_Ey,FV_Ez, FV_Ex+Cos(alpha), FV_Ey+Sin(alpha), FV_Ez+Sin(ph), 0, 0, 1);     
+      gluLookAt(FV_Ex,FV_Ey,FV_Ez, FV_Ex+Sin(alpha), FV_Ey+Cos(alpha), FV_Ez+Sin(ph), 0, 0, 1);     
    }
 
    // Draw a land
    land(3,3,3);
 
    // Draw a solid airplane
-   SolidPlane(-1,1,3 , 1,0,0 , 0,0,1 , 1);
+   SolidPlane(-1,1,3 , 1,-1,0 , 0,0,1 , 1);
 
    // Draw houses
    house(1,1,0 , 0.5,0.5,0.5 , 0);
@@ -490,6 +490,9 @@ void display()
    tree(1,2,0, 0.4);
    tree(1,-2,0, 0.8);
    tree(-1,1,0, 0.2);
+
+   // Draw cars
+   // car(0,1,0, 0, 1);
 
    //  Draw axes
    glColor3f(1,1,1);
@@ -515,7 +518,7 @@ void display()
    //  Display parameters
    glWindowPos2i(5,5);
    if (mode == 2)
-      Print("Angle=%d,%d  FOV=%d Projection=%s",ph,alpha,fov,text[mode]);
+      Print("Angle=%d,%d  FOV=%d Projection=%s",alpha,ph,fov,text[mode]);
    else
       Print("Angle=%d,%d  Dim=%.1f FOV=%d Projection=%s",th,ph,dim,fov,text[mode]);
 
@@ -533,11 +536,11 @@ void special(int key,int x,int y)
    //  Right arrow key - increase angle by 5 degrees
    if (key == GLUT_KEY_RIGHT){
       th += 5;
-      alpha -= 5;}
+      alpha += 5;}
    //  Left arrow key - decrease angle by 5 degrees
    else if (key == GLUT_KEY_LEFT){
       th -= 5;
-      alpha += 5;}
+      alpha -= 5;}
    //  Up arrow key - increase elevation by 5 degrees
    else if (key == GLUT_KEY_UP)
       ph += 5;
@@ -570,8 +573,12 @@ void key(unsigned char ch,int x,int y)
    if (ch == 27)
       exit(0);
    //  Reset view angle
-   else if (ch == '0')
-      th = ph = step = FV_Ex = FV_Ey = 0;
+   else if (ch == '0'){
+      th = ph = step = 0;
+      FV_Ex = 0;
+      FV_Ey = -3.0;
+      alpha = 0;
+   }
    //  Toggle axes
    else if (ch == 'a' || ch == 'A')
       axes = 1-axes;

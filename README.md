@@ -34,7 +34,7 @@ $unzip hw2.zip && make clean && make && ./hw2
 
 ### Common keys  
 * `0`: Reset view angles to default value
-* `a`: turn axes on/off
+* `a/A`: turn axes on/off
 * `Ese`: exit the window
 
 ## Implementation Details
