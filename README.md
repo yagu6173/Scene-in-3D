@@ -29,8 +29,8 @@ $unzip hw2.zip && make clean && make && ./hw2
 * `Up/Down/Left/Right` arrow key: Look up/down/left/right
 
 ### Orthogonal/Perspective  
-* `Up/Down` arrow key: Increase/decrese angle of elevation 
-* `Left/Right` arrow key: Increase/decrese angle of azimuth
+* `Up/Down` arrow key: Increase/decrese angle of elevation to rotate around (1,0,0)
+* `Left/Right` arrow key: Increase/decrese angle of azimuth to rotate around (0,0,1) 
 
 ### Common keys  
 * `0`: Reset view angles to default value

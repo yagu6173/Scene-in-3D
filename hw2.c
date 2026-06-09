@@ -4,12 +4,14 @@
  *  HW2: Draw some objects to demonstrate orthogonal, prespective and first-person projections
  *
  *  Key bindings:
- *  m/M          Toggle between orthogonal, perspective and first-person views 
+ *  m/M        Toggle between orthogonal, perspective and first-person views 
  *  +/-        Changes field of view for perspective
- *  a          Toggle axes
- *  arrows     Change view angle
+ *  a/A        Toggle axes
+ *  arrows     Change view angle of azimuth and elevation
+ *  f/F        Move forward in first-person view
+ *  b/B        Move backward in first-person view
  *  PgDn/PgUp  Zoom in and out
- *  0          Reset view angle
+ *  0          Reset all view angles
  *  ESC        Exit
  */
 #include <stdio.h>
@@ -31,8 +33,8 @@
 
 int axes=1;       //  Display axes
 int mode=0;       //  Projection mode
-int th=0;         //  Azimuth of view angle
-int ph=0;         //  Elevation of view angle
+int th=0;         //  Azimuth of view angle rotating around (0,0,1)
+int ph=0;         //  Elevation of view angle rotating around (1,0,0)
 int step=0;       //  Step counter for first person movement
 int t = 0;        //  Step direction for first person movement
 int alpha=0;     //  First person view angle
@@ -452,15 +454,26 @@ void display()
    if (mode==0)
    {
       glRotatef(ph,1,0,0); // Rotate around x-axis (elevation)
-      glRotatef(th,0,1,0); // Rotate around y-axis (azimuth)
+      glRotatef(th,0,0,1); // Rotate around z-axis (azimuth)
    }
    //  Perspective - set eye position
    else if (mode==1)
    {
-      double Ex = -2*dim*Sin(th)*Cos(ph);
-      double Ey = +2*dim        *Sin(ph);
-      double Ez = +2*dim*Cos(th)*Cos(ph);
-      gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
+      // double Ex = -2*dim*Sin(th)*Cos(ph);
+      // double Ey = +2*dim        *Sin(ph);
+      // double Ez = +2*dim*Cos(th)*Cos(ph);
+      // gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
+      
+      // Set the eye position
+      double Ex = 2*dim*Sin(ph)*Sin(th);
+      double Ey = 2*dim*Sin(ph)*Cos(th);
+      double Ez = 2*dim*Cos(ph);
+      // Set the up vector
+      double Ux = Cos(ph)*Sin(th);
+      double Uy = Cos(ph)*Cos(th);
+      double Uz = -Sin(ph);
+
+      gluLookAt(Ex,Ey,Ez, 0,0,0, Ux,Uy,Uz);
    }
    // First person - set eye position and orientation
    else if (mode==2)
